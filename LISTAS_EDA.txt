@@ -1,0 +1,16 @@
+Cara al futuro proyecto EDA, necesitamos que pienses 3 a 5 posibles problemas que te gustaría resolver usando datos (un detector de guerra, un sistema que me diga en que cubo tengo que tirar la basura, etc) y 3 a 5 posibles conjuntos de datos que te gustaría usar (aunque no tengas acceso a ellos, pej: la información del tiempo y clima en el mundo en los últimos 20 años, los números de la lotería en los últimos 3 años,…)
+
+1. Optimización del Consumo Energético en Hogares:
+   1.1.  Información sobre el consumo energético de hogares y empresas.
+   1.2.  Información sobre los precios de la electricidad a lo largo del tiempo, desglosados por región, tipo de consumidor y períodos de demanda alta y baja.
+   1.3.  Información sobre la producción y el consumo de energía a partir de fuentes renovables como la solar y eólica.
+
+2. Optimización de Inventarios en Comercio Minorista:
+   2.1.  Información sobre ventas e inventarios en tiendas minoristas, incluyendo datos históricos y patron de ventas estacionales.
+   2.2.  Información sobre los proveedores, incluyendo tiempos de entrega, costos de envío, y volúmenes mínimos de pedido.
+   2.3.  Historial de promociones y descuentos aplicados a diferentes productos, incluyendo fechas, duración y resultados en ventas.
+
+3. Análisis de la Satisfacción del Cliente:
+   3.1.  Opiniones y comentarios de clientes sobre productos y servicios, recopilados de encuestas, redes sociales y plataformas de reseñas.
+   3.2.  Información sobre las características demográficas y psicográficas de los clientes, incluyendo edad, género, ubicación, intereses, y estilos de vida.
+   3.3.  Información sobre cómo los clientes usan los productos o servicios, incluyendo métricas de uso, características más utilizadas, y patrones de interacción.
