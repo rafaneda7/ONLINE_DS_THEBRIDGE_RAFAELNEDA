@@ -1,0 +1,52 @@
+# Todas juntas
+
+fig,axs = plt.subplots(2,2, figsize = (20,20))
+axs = axs.flatten()
+
+# Primera figura
+primera = axs[0]
+ciudades_mas_pobladas = df_cali.loc[df_cali.population_total.nlargest(5).index, ["city","population_total"]]
+ciudades = [separa_nombre(ciudad) for ciudad in ciudades_mas_pobladas["city"].to_list()]
+colores = ["blue","gray","red","olive","brown"]
+
+primera.bar(x= ciudades, height= ciudades_mas_pobladas["population_total"]/1000, color = colores, alpha = 0.5)
+primera.set_ylim([0,5000])
+primera.set_ylabel("Habitantes (miles)")
+primera.set_xlabel("Ciudades")
+
+ciudades_mas_pobladas.set_index("city", inplace = True)
+for indice, ciudad in enumerate(ciudades_mas_pobladas.index):
+    poblacion = ciudades_mas_pobladas.loc[ciudad,"population_total"]/1000
+    primera.text(ciudades[indice], poblacion + 100, f"{poblacion}", ha = "center")
+primera.set_title("Ciudades más pobladas de California")
+
+# Segunda gráfica
+segunda = axs[1]
+segunda.hist(df_cali["area_total_km2"], color = "steelblue", alpha = 0.7, bins = 50, label = "Hist Area")
+segunda.set_xlabel("Superficie ($km^2$)", fontdict = dict(family = "Bradley Hand itc", size = 18))
+segunda.set_ylabel("Número de Ciudades", fontdict= dict(family = "Bradley Hand itc", size = 18))
+segunda.legend()
+
+
+# Tercera gráfica
+tercera = axs[2]
+tercera.scatter(df_cali["area_water_km2"], df_cali["population_total"]/1000, alpha = 0.5, color = "green")
+tercera.set_xlabel("Área de agua en la ciudad ($km^2$)")
+tercera.set_ylabel("Población (miles habitantes)")
+tercera.set_title("Población por kilometro cuadrado de agua")
+outlier_1_y = ciudades_mas_pobladas.population_total.max()
+outlier_2_y = ciudades_mas_pobladas.population_total.nlargest(2).iloc[1]
+outlier_1_x = df_cali.loc[df_cali.population_total == outlier_1_y,"area_water_km2"].values[0]
+outlier_2_x = df_cali.loc[df_cali.population_total == outlier_2_y,"area_water_km2"].values[0]
+tercera.annotate(xy= (outlier_1_x,outlier_1_y/1000), xytext= (60,3500), text = "Outliers",
+              arrowprops= dict(arrowstyle = "->"))
+tercera.annotate(xy= (outlier_2_x,outlier_2_y/1000), xytext= (60,3500), text = "Outliers",
+              arrowprops= dict(arrowstyle = "->"))
+
+
+#### Cuarta gráfica
+cuarta = axs[3]
+cuarta.boxplot(df_cali["elevation_m"].dropna(), vert = False, boxprops = dict(facecolor = "red"),
+               medianprops = dict(color= "black"), patch_artist= True)
+cuarta.set_xlabel("Altitud (m)")
+cuarta.set_title("Diagrama de caja de la Altitud de las ciudades de California");
