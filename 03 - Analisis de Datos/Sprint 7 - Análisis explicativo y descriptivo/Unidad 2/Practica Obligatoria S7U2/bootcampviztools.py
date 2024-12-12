@@ -123,7 +123,7 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
 
             # Crea el gráfico
             plt.figure(figsize=(10, 6))
-            ax = sns.barplot(x=data_subset.index, y=data_subset.values)
+            ax = sns.barplot(x=data_subset.index, y=data_subset.values, hue=data_subset.index)
 
             # Añade títulos y etiquetas
             plt.title(f'Relación entre {categorical_col} y {numerical_col} - Grupo {i + 1}')
@@ -143,7 +143,7 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
     else:
         # Crea el gráfico para menos de 5 categorías
         plt.figure(figsize=(10, 6))
-        ax = sns.barplot(x=grouped_data.index, y=grouped_data.values)
+        ax = sns.barplot(x=grouped_data.index, y=grouped_data.values, hue=data_subset.index)
 
         # Añade títulos y etiquetas
         plt.title(f'Relación entre {categorical_col} y {numerical_col}')
