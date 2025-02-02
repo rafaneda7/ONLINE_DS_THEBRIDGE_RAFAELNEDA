@@ -283,3 +283,42 @@ def plot_features_cat_regression(dataframe, target_col, categorical_columns, wit
         fig.delaxes(axes[j])
 
     plt.show()
+
+
+# EXTRA EXTRA EXTRA 
+
+def seleccionar_features(df, target, umbral_correlacion=0.15, umbral_correlacion_entre_features=0.7):
+    """
+    Selecciona las características relevantes basadas en su correlación con el target y elimina 
+    las características con alta correlación entre ellas.
+
+    Argumentos:
+    df (pd.DataFrame): El DataFrame que contiene las variables a analizar.
+    target (str): El nombre de la columna del target con el que se calculará la correlación.
+    umbral_correlacion (float, opcional): El umbral mínimo de correlación con el target para seleccionar una característica (por defecto es 0.15).
+    umbral_correlacion_entre_features (float, opcional): El umbral de correlación máxima entre características para eliminar aquellas que sean demasiado similares (por defecto es 0.7).
+
+    Retorna:
+    list: Una lista de nombres de las características seleccionadas.
+    """
+    
+    # Calcular la matriz de correlación
+    correlacion = df.corr()
+
+    # Seleccionar las features con correlación mayor a 0.15 con el target
+    correlacion_target = correlacion[target].abs()
+    features_sel = correlacion_target[correlacion_target > umbral_correlacion].index.tolist()
+
+    # Filtrar las features seleccionadas que tengan una correlación mayor a 0.7 entre ellas
+    features_a_eliminar = []
+    for i, feat1 in enumerate(features_sel):
+        for feat2 in features_sel[i+1:]:
+            if abs(correlacion[feat1][feat2]) > umbral_correlacion_entre_features:
+                # Eliminar la feature con mayor correlación
+                if feat1 not in features_a_eliminar:
+                    features_a_eliminar.append(feat2)  # Eliminar la segunda feature
+
+    # Filtrar la lista de features seleccionadas
+    features_sel = [feat for feat in features_sel if feat not in features_a_eliminar]
+    
+    return features_sel
