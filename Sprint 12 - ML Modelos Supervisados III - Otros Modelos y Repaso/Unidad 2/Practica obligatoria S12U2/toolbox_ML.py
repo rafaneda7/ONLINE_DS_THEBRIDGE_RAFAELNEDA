@@ -283,3 +283,48 @@ def plot_features_cat_regression(dataframe, target_col, categorical_columns, wit
         fig.delaxes(axes[j])
 
     plt.show()
+
+
+# EXTRA EXTRA EXTRA 
+
+def seleccionar_features(df, target, umbral_correlacion=0.15, umbral_correlacion_entre_features=0.7):
+
+    # Filtrar solo las columnas numéricas
+    df_numeric = df.select_dtypes(include=[np.number])
+    
+    # Excluir las columnas binarias (aquellas con solo dos valores únicos, 0 y 1)
+    columnas_no_binarias = [col for col in df_numeric.columns if df_numeric[col].nunique() > 2]
+    df_numeric = df_numeric[columnas_no_binarias]
+
+    # Calcular la matriz de correlación
+    correlacion = df_numeric.corr()
+
+    # Verificar que el target esté en la matriz de correlación
+    if target not in correlacion.columns:
+        raise ValueError(f"El target '{target}' no se encuentra en el DataFrame o no es numérico.")
+
+    # Seleccionar las features con correlación mayor al umbral con el target
+    correlacion_target = correlacion[target].abs()
+    features_sel = correlacion_target[correlacion_target > umbral_correlacion].index.tolist()
+
+    # Remover el target de la lista de features
+    if target in features_sel:
+        features_sel.remove(target)
+
+    # Filtrar las features con alta correlación entre ellas
+    features_a_eliminar = []
+    for i, feat1 in enumerate(features_sel):
+        for feat2 in features_sel[i+1:]:
+            if abs(correlacion.loc[feat1, feat2]) > umbral_correlacion_entre_features:
+                if feat1 not in features_a_eliminar:
+                    features_a_eliminar.append(feat2)  # Eliminar la segunda feature
+
+    # Filtrar la lista de features seleccionadas
+    features_sel = [feat for feat in features_sel if feat not in features_a_eliminar]
+    
+    return features_sel
+
+
+
+
+
