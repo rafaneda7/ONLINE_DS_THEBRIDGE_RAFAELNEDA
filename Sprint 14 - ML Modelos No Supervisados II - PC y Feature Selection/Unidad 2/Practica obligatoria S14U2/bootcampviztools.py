@@ -3,6 +3,32 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
+def cardinalidad(df):
+    """
+    Función para analizar la cardinalidad de las columnas de un DataFrame y clasificarlas según su tipo.
+
+    Parámetros:
+        df (pd.DataFrame): El DataFrame a analizar.
+
+    Retorna:
+        pd.DataFrame: DataFrame con información de cardinalidad y clasificación de las columnas.
+    """
+    # Crear DataFrame con la información inicial
+    df_tipificacion = pd.DataFrame({
+        "Card": df.nunique(),
+        "%_Card": df.nunique() / len(df) * 100,
+        "Tipo": df.dtypes
+    }).reset_index().rename(columns={"index": "Columna"})
+
+    # Asignar clasificación inicial
+    df_tipificacion["Clasificada_como"] = "Categorica"
+
+    # Clasificar columnas según condiciones
+    df_tipificacion.loc[df_tipificacion["Card"] == 2, "Clasificada_como"] = "Binaria"
+    df_tipificacion.loc[df_tipificacion["Card"] > 15, "Clasificada_como"] = "Numerica Discreta"
+    df_tipificacion.loc[df_tipificacion["%_Card"] > 30, "Clasificada_como"] = "Numerica Continua"
+
+    return df_tipificacion
 
 def pinta_distribucion_categoricas(df, columnas_categoricas, relativa=False, mostrar_valores=False):
     num_columnas = len(columnas_categoricas)
@@ -16,11 +42,11 @@ def pinta_distribucion_categoricas(df, columnas_categoricas, relativa=False, mos
         if relativa:
             total = df[col].value_counts().sum()
             serie = df[col].value_counts().apply(lambda x: x / total)
-            sns.barplot(x=serie.index, y=serie, ax=ax, palette='viridis', hue = serie.index, legend = False)
+            sns.barplot(x=serie.index, y=serie, ax=ax, palette='viridis', hue = serie.index, legend = False, edgecolor="black")
             ax.set_ylabel('Frecuencia Relativa')
         else:
             serie = df[col].value_counts()
-            sns.barplot(x=serie.index, y=serie, ax=ax, palette='viridis', hue = serie.index, legend = False)
+            sns.barplot(x=serie.index, y=serie, ax=ax, palette='viridis', hue = serie.index, legend = False, edgecolor="black")
             ax.set_ylabel('Frecuencia')
 
         ax.set_title(f'Distribución de {col}')
@@ -162,31 +188,47 @@ def plot_categorical_numerical_relationship(df, categorical_col, numerical_col, 
         plt.show()
 
 
-def plot_combined_graphs(df, columns, whisker_width=1.5, bins = None):
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def plot_combined_graphs(df, columns, whisker_width=1.5, bins=None):
     num_cols = len(columns)
     if num_cols:
-        
-        fig, axes = plt.subplots(num_cols, 2, figsize=(12, 5 * num_cols))
-        print(axes.shape)
+        # Ajustamos el número de columnas a 3 si hay más de una columna, 2 si solo hay una
+        fig, axes = plt.subplots(num_cols, 3 if num_cols > 1 else 2, figsize=(18, 5 * num_cols))  # 3 columnas para gráficos
 
         for i, column in enumerate(columns):
             if df[column].dtype in ['int64', 'float64']:
                 # Histograma y KDE
-                sns.histplot(df[column], kde=True, ax=axes[i,0] if num_cols > 1 else axes[0], bins= "auto" if not bins else bins)
+                sns.histplot(df[column], kde=True, ax=axes[i, 0] if num_cols > 1 else axes[0], bins="auto" if not bins else bins)
                 if num_cols > 1:
-                    axes[i,0].set_title(f'Histograma y KDE de {column}')
+                    axes[i, 0].set_title(f'Histograma y KDE de {column}')
                 else:
                     axes[0].set_title(f'Histograma y KDE de {column}')
 
                 # Boxplot
-                sns.boxplot(x=df[column], ax=axes[i,1] if num_cols > 1 else axes[1], whis=whisker_width)
+                sns.boxplot(x=df[column], ax=axes[i, 1] if num_cols > 1 else axes[1], whis=whisker_width)
                 if num_cols > 1:
-                    axes[i,1].set_title(f'Boxplot de {column}')
+                    axes[i, 1].set_title(f'Boxplot de {column}')
                 else:
                     axes[1].set_title(f'Boxplot de {column}')
 
+                # Violin Plot solo si hay más de una columna
+                if num_cols > 1:
+                    sns.violinplot(x=df[column], ax=axes[i, 2])
+                    axes[i, 2].set_title(f'Violin Plot de {column}')
+                else:
+                    # Si solo hay una columna, no se dibuja el violin plot
+                    pass
+
         plt.tight_layout()
         plt.show()
+
+
+
 
 def plot_grouped_boxplots(df, cat_col, num_col):
     unique_cats = df[cat_col].unique()
@@ -205,7 +247,7 @@ def plot_grouped_boxplots(df, cat_col, num_col):
 
 
 
-def plot_grouped_histograms(df, cat_col, num_col, group_size):
+def plot_grouped_histograms(df, cat_col, num_col, group_size, bins = "auto"):
     unique_cats = df[cat_col].unique()
     num_cats = len(unique_cats)
 
@@ -215,7 +257,7 @@ def plot_grouped_histograms(df, cat_col, num_col, group_size):
         
         plt.figure(figsize=(10, 6))
         for cat in subset_cats:
-            sns.histplot(subset_df[subset_df[cat_col] == cat][num_col], kde=True, label=str(cat))
+            sns.histplot(subset_df[subset_df[cat_col] == cat][num_col], kde=True, label=str(cat), bins = bins)
         
         plt.title(f'Histograms of {num_col} for {cat_col} (Group {i//group_size + 1})')
         plt.xlabel(num_col)
